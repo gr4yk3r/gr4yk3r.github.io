@@ -1,0 +1,4 @@
+User-agent: *
+Disallow: 
+
+Sitemap: http://gr4yk3r.github.io/sitemap.xml 
