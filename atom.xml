@@ -4,7 +4,7 @@
   <title><![CDATA[gr4yk3r's Blog]]></title>
   <link href="http://gr4yk3r.github.io/atom.xml" rel="self"/>
   <link href="http://gr4yk3r.github.io/"/>
-  <updated>2014-09-25T12:47:05+08:00</updated>
+  <updated>2014-09-29T09:56:05+08:00</updated>
   <id>http://gr4yk3r.github.io/</id>
   <author>
     <name><![CDATA[gr4yk3r]]></name>
@@ -12,6 +12,29 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[我感兴趣的一些比较牛逼的网站(持续更新)]]></title>
+    <link href="http://gr4yk3r.github.io/blog/2014/09/28/wo-gan-xing-qu-de-%5B%3F%5D-xie-bi-jiao-niu-bi-de-wang-zhan-chi-xu-geng-xin/"/>
+    <updated>2014-09-28T14:31:59+08:00</updated>
+    <id>http://gr4yk3r.github.io/blog/2014/09/28/wo-gan-xing-qu-de-[?]-xie-bi-jiao-niu-bi-de-wang-zhan-chi-xu-geng-xin</id>
+    <content type="html"><![CDATA[<p>软件逆向相关
+<a href="http://www.pediy.com/">http://www.pediy.com/</a></p>
+
+<p>web安全相关
+<a href="https://www.owasp.org">https://www.owasp.org</a>
+<a href="http://www.wooyun.org/">http://www.wooyun.org/</a></p>
+
+<p>ios安全相关介绍
+<a href="http://security.ios-wiki.com/">http://security.ios-wiki.com/</a></p>
+
+<p>互联网安全事件相关
+<a href="http://www.freebuf.com/">http://www.freebuf.com/</a></p>
+
+<p>个人博客
+<a href="http://coolshell.cn/">http://coolshell.cn/</a></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[新开始]]></title>
