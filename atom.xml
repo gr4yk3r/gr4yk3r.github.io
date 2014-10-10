@@ -4,7 +4,7 @@
   <title><![CDATA[gr4yk3r's Blog]]></title>
   <link href="http://gr4yk3r.github.io/atom.xml" rel="self"/>
   <link href="http://gr4yk3r.github.io/"/>
-  <updated>2014-09-29T16:51:48+08:00</updated>
+  <updated>2014-10-10T15:09:06+08:00</updated>
   <id>http://gr4yk3r.github.io/</id>
   <author>
     <name><![CDATA[gr4yk3r]]></name>
@@ -18,28 +18,32 @@
     <link href="http://gr4yk3r.github.io/blog/2014/09/28/wo-gan-xing-qu-de-%5B%3F%5D-xie-bi-jiao-niu-bi-de-wang-zhan-chi-xu-geng-xin/"/>
     <updated>2014-09-28T14:31:59+08:00</updated>
     <id>http://gr4yk3r.github.io/blog/2014/09/28/wo-gan-xing-qu-de-[?]-xie-bi-jiao-niu-bi-de-wang-zhan-chi-xu-geng-xin</id>
-    <content type="html"><![CDATA[<p>软件逆向相关</p>
+    <content type="html"><![CDATA[<h3>软件逆向相关</h3>
 
 <pre><code>http://www.pediy.com/
 </code></pre>
 
-<p>web安全相关</p>
+<h3>web安全相关</h3>
 
 <pre><code>https://www.owasp.org
 http://www.wooyun.org/
 </code></pre>
 
-<p>ios安全相关介绍</p>
+<h3>ios安全相关介绍</h3>
 
 <pre><code>http://security.ios-wiki.com/
+https://github.com/kennytm/iphone-private-frameworks
+https://github.com/nst/iOS-Runtime-Headers
+http://opensource.apple.com/source/objc4/objc4-493.11/runtime/
+http://theiphonewiki.com/wiki/Main_Page
 </code></pre>
 
-<p>互联网安全事件相关</p>
+<h3>互联网安全事件相关</h3>
 
 <pre><code>http://www.freebuf.com/
 </code></pre>
 
-<p>个人博客</p>
+<h3>个人博客</h3>
 
 <pre><code>http://coolshell.cn/
 </code></pre>
