@@ -9,9 +9,7 @@
   <meta name="author" content="gr4yk3r">
 
   
-  <meta name="description" content="软件逆向相关 http://www.pediy.com/ web安全相关 https://www.owasp.org
-http://www.wooyun.org/ ios安全相关介绍 http://security.ios-wiki.com/
-https://github.com/kennytm/ &hellip;">
+  <meta name="description" content="前言 最近看到stackoverflow上一个关于在主线程上使用Reachability时会有一定几率出现卡死UI的问题，顿时吓出一身冷汗，我在一个项目中由于要统计当前联网状态，频繁的调用了Reachability获取当前网络状态，要是会出现卡死状况，用户基数那么大，使用频率又那么高， &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -68,6 +66,122 @@ https://github.com/kennytm/ &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/11/27/reachabilitybu-dang-shi-yong-hui-qia-si-ui/">Reachability不当使用会卡死UI</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2014-11-27T13:26:06+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>27</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>1:26 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h2>前言</h2>
+
+<p>最近看到stackoverflow上一个关于在主线程上使用Reachability时会有一定几率出现卡死UI的问题，顿时吓出一身冷汗，我在一个项目中由于要统计当前联网状态，频繁的调用了Reachability获取当前网络状态，要是会出现卡死状况，用户基数那么大，使用频率又那么高，调用时即使有万分之一的概率，那也是不容忽视的啊，想到这里，吓尿了。赶紧研究一下到底是什么情况吧！</p>
+
+
+<h2>分析过程</h2>
+
+<p>先给出stackoverflow原始链接吧！
+<a href="http://stackoverflow.com/questions/17648972/main-thread-blocked-on-scnetworkreachabilitygetflags">http://stackoverflow.com/questions/17648972/main-thread-blocked-on-scnetworkreachabilitygetflags</a></p>
+
+<p>提问者说再调用SCNetworkReachabilityGetFlags发生过一次卡死的情况，赶紧检索了下项目，发现项目中主要调用了currentReachabilityStatus函数，而currentReachabilityStatus函数用到了SCNetworkReachabilityGetFlags。但是这个函数怎么会卡死呢，看了该问题获得最高投票的答案，回答者以不太肯定的语气说可能在SCNetworkReachabilityGetFlags函数中同步ping了something，原话在这里（I think there is a big chance that this function pings something on the Internet. If the remote host it tries to ping is not reachable for some reason(you&#8217;ve lost internet connection) you will get ordinary network timeouts which can be really long (30 sec). You will block you main thread (with all the UI) for this time.）。看来是猜测的啊，但是宁可信其有，不能信其无啊。深入挖掘一下吧（对了，弱弱的问一下，挖掘机技术哪家强？）。</p>
+
+
+<p>OK，言归正传，按上述答案的说法，在网络不好时，调用SCNetworkReachabilityGetFlags可能会出现超时等情况，所以会阻塞主线程。但是我忽然想到苹果官方的Reachability使用demo里获取到网络状态变化时候，同样要调用currentReachabilityStatus获取当前网络啊，同样会用到SCNetworkReachabilityGetFlags方法啊，这么说苹果官方用法在无网络或网络差的情况下，同样会阻塞当前线程。苹果会给出这么low的方案吗？不管你信不信，反正我是不信。所以持续怀疑上述stackoverflow的那个猜测答案。</p>
+
+
+<p>于是就持续在google搜索Reachability sync关键字，终于发现又发现了一个相关提问。
+<a href='http://stackoverflow.com/questions/11314819/how-to-check-for-network-reachability-on-ios-in-a-non-blocking-manner'>http://stackoverflow.com/questions/11314819/how-to-check-for-network-reachability-on-ios-in-a-non-blocking-manner</a>
+提问者使用了两种方式，第一种如下：
+</p>
+
+
+<pre><code>    Reachability *reach = [Reachability reachabilityWithHostName:@"google.com"];
+    if([reach currentReachabilityStatus] == NotReachable) 
+    {
+       // ...prompt user to establish an internet connection
+    } else {
+       // ...send an asynchronous request with a timeout
+    }
+</code></pre>
+
+<p>提问者说使用该种方式，在网络不好的情况下会阻塞线程长达30s，跟第一个stackoverflow描述的很像嘛！下面看第二种方式：</p>
+
+
+<pre><code>    if([[Reachability reachabilityForInternetConnection] currentReachabilityStatus] == NotReachable) {
+     // ...prompt user to establish an internet connection
+ } 
+ else {
+     // ...send an asynchronous request with a timeout
+ }
+</code></pre>
+
+<p>提问者说第二种方式不会阻塞线程，看到这里，身上的冷汗顿时干了。因为我们项目里通过host判断网络都是按apple给的那种方法，通过startNotifier进行异步调用，没通过异步调用的也是使用上述第二种方法进行的判断。接着提问者问why。我也想问why，但是在没有源码的情况下，who the fuck knows why！苹果说啥就是啥？别的啥也不好使！找找官方说明吧！</p>
+
+
+<p>于是我开着挖掘机继续挖掘，挖到了苹果官网Reachability的Readme，挖着挖着挖到官方说明了，看下面原文描述：</p>
+
+
+<pre><code>    The Reachability sample demonstrates the asynchronous use of the SCNetworkReachability API. You can use the API synchronously, but do not issue a synchronous check by hostName on the main thread. If the device cannot reach a DNS server or is on a slow network, a synchronous call to the SCNetworkReachabilityGetFlags function can block for up to 30 seconds trying to resolve the hostName. If this happens on the main thread, the application watchdog will kill the application after 20 seconds of inactivity.
+</code></pre>
+
+<p>上面blablabla一大段，说的什么意思呢？继续往下看翻译：</p>
+
+
+<pre><code>     这个Reachability例子展示了SCNetworkReachability API的异步使用方法，你可以同步的使用这些API（意思就是按apple那种异步使用方法，你在用时候就不用再做异步了，直接使用即可）,但是千万不要（do not而不是don't指特别强调）在主线程中同步的通过hostname检测网络。如果设备不能访问dns server或网速很慢的情况下，同步调用SCNetworkReachabilityGetFlags可能会在解析域名时候阻塞长达30s。如果发生在主线程，app就会在卡死20s后被watchdog杀死。
+</code></pre>
+
+<p>仔细体会这段话，发现问题出现在网络不好情况下的域名解析过程中，所以这就完美解释了刚才第二个stackoverflow说的那种情况。之所以第一种用法会阻塞，就是因为在主线程同步的通过hostname检测网络状况，100%命中苹果的异常case。第二种用法没用域名检测，所以就没有问题！那么reachabilityForInternetConnection这种用法是怎么检测网络的呢，继续挖掘发现reachabilityForInternetConnection里构造了个sockaddr_in，初始化后直接通过reachabilityWithAddress构造的Reachability，因为sockaddr_in初始化没有对ip赋值，其实传给reachabilityWithAddress的ip是0.0.0.0，由于没有源码，具体怎么通过这个reachabilityForInternetConnection判断的网络状况还不太清楚，也不好妄加猜测，以免误导大家，不过按照苹果说法只要不在主线程中同步检测到某个域名的网络状况是不会卡死UI的。而且网上确实有按上述第二个stackoverflow提问中的第二种用法使用的（http://weimenglee.blogspot.jp/2013/08/ios-tip-detecting-network-connectivity.html），所以大家可放心使用。</p>
+
+
+<p>挖掘并没有到此结束，第一个stackoverflow提问时怎么会卡死的呢，貌似没有见到域名啊！直接看代码吧！</p>
+
+
+<pre><code>- (BOOL) isReachableViaWiFi {
+
+NSAssert(reachabilityRef, @"isReachableViaWiFi called with NULL reachabilityRef");
+
+SCNetworkReachabilityFlags flags = 0;
+NetworkStatus status = NotReachable;
+
+if (SCNetworkReachabilityGetFlags(reachabilityRef, &amp;flags)) {
+    status = [self networkStatusForFlags: flags];
+    return  (ReachableViaWiFi == status);
+}
+
+return NO;
+
+} // isReachableViaWiFi
+</code></pre>
+
+<p>确实没有域名啊，不通过域名就不会进行域名解析，也就不会卡死啊，难道刚才的结论都推翻了？苹果不会low到连文档都描述不清的地步吧，那还如何让众多开发者信任，官方文档可是开发者的圣经啊。或者是我low到连文档都读不懂的地步了？百思不得其姐啊！其实他这个函数是Reachability里的一个函数，之所以会阻塞必然是在主线程通过hostName构造了个Reachability对象，然后直接通过该对象调用isReachableViaWiFi函数，所以触发了苹果的异常case(千万不要在主线程中同步的通过hostname检测网络。如果设备不能访问dns server或网速很慢的情况下，同步调用SCNetworkReachabilityGetFlags可能会在解析域名时候阻塞长达30s)。我已经在stackoverflow上联系那小伙验证一下猜想了。等有结果了再分享给大家</p>
+
+
+<h2>结论</h2>
+
+<p>1、要仔细阅读苹果官方文档，很多地方出现问题都是用的不对。
+2、要仔细判定网上帖子的说法的正确性，一个不甚可能被误导，结合官方文档验证网上帖子。
+3、挖掘技术一定要强(那么问题又来了……)。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -168,6 +282,10 @@ http://theiphonewiki.com/wiki/Main_Page
     <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014/11/27/reachabilitybu-dang-shi-yong-hui-qia-si-ui/">Reachability不当使用会卡死UI</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2014/09/28/wo-gan-xing-qu-de-%5B%3F%5D-xie-bi-jiao-niu-bi-de-wang-zhan-chi-xu-geng-xin/">我感兴趣的一些的网站(持续更新)</a>
