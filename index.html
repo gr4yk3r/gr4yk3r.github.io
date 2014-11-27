@@ -171,7 +171,8 @@ return NO;
 <p>确实没有域名啊，不通过域名就不会进行域名解析，也就不会卡死啊，难道刚才的结论都推翻了？苹果不会low到连文档都描述不清的地步吧，那还如何让众多开发者信任，官方文档可是开发者的圣经啊。或者是我low到连文档都读不懂的地步了？百思不得其姐啊！其实他这个函数是Reachability里的一个函数，之所以会阻塞必然是在主线程通过hostName构造了个Reachability对象，然后直接通过该对象调用isReachableViaWiFi函数，所以触发了苹果的异常case(千万不要在主线程中同步的通过hostname检测网络。如果设备不能访问dns server或网速很慢的情况下，同步调用SCNetworkReachabilityGetFlags可能会在解析域名时候阻塞长达30s)。我已经在stackoverflow上联系那小伙验证一下猜想了。等有结果了再分享给大家</p>
 
 
-<p>附苹果Reachability Readme。<a href="https://developer.apple.com/library/ios/samplecode/Reachability/Listings/ReadMe_txt.html#//apple_ref/doc/uid/DTS40007324-ReadMe_txt-DontLinkElementID_10">https://developer.apple.com/library/ios/samplecode/Reachability/Listings/ReadMe_txt.html#//apple_ref/doc/uid/DTS40007324-ReadMe_txt-DontLinkElementID_10</a></p>
+<p>附苹果Reachability Readme。
+<a href="https://developer.apple.com/library/ios/samplecode/Reachability/Listings/ReadMe_txt.html#//apple_ref/doc/uid/DTS40007324-ReadMe_txt-DontLinkElementID_10">https://developer.apple.com/library/ios/samplecode/Reachability/Listings/ReadMe_txt.html#//apple_ref/doc/uid/DTS40007324-ReadMe_txt-DontLinkElementID_10</a></p>
 
 <h2>结论</h2>
 
@@ -181,7 +182,7 @@ return NO;
 <p>2、要仔细判定网上帖子的说法的正确性，一个不甚可能被误导，结合官方文档验证网上帖子。</p>
 
 
-<p>3、挖掘技术一定要强(那么问题又来了……)。</p>
+<p>3、挖掘技术一定要强，必要时候得学一下(那么问题又来了……)。</p>
 
 
 
