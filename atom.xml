@@ -4,7 +4,7 @@
   <title><![CDATA[gr4yk3r's Blog]]></title>
   <link href="http://gr4yk3r.github.io/atom.xml" rel="self"/>
   <link href="http://gr4yk3r.github.io/"/>
-  <updated>2014-11-27T16:51:42+08:00</updated>
+  <updated>2014-11-27T16:55:10+08:00</updated>
   <id>http://gr4yk3r.github.io/</id>
   <author>
     <name><![CDATA[gr4yk3r]]></name>
@@ -98,7 +98,7 @@ return NO;
 } // isReachableViaWiFi
 </code></pre>
 
-<p>确实没有域名啊，不通过域名就不会进行域名解析，也就不会卡死啊，难道刚才的结论都推翻了？苹果不会low到连文档都描述不清的地步吧，那还如何让众多开发者信任，官方文档可是开发者的圣经啊。或者是我low到连文档都读不懂的地步了？百思不得其姐啊！其实他这个函数是Reachability里的一个函数，之所以会阻塞必然是在主线程通过hostName构造了个Reachability对象，然后直接通过该对象调用isReachableViaWiFi函数，所以触发了苹果的异常case(千万不要在主线程中同步的通过hostname检测网络。如果设备不能访问dns server或网速很慢的情况下，同步调用SCNetworkReachabilityGetFlags可能会在解析域名时候阻塞长达30s)。我已经在stackoverflow上联系那小伙验证一下猜想了。等有结果了再分享给大家</p>
+<p>确实没有域名啊，不通过域名就不会进行域名解析，也就不会卡死啊，难道刚才的结论都推翻了？苹果不会low到连文档都描述不清的地步吧，那还如何让众多开发者信任，官方文档可是开发者的圣经啊。或者是我low到连文档都读不懂的地步了？百思不得其姐啊！其实他这个函数是Reachability里的一个函数，之所以会阻塞必然是在主线程通过hostName构造了个Reachability对象，然后直接通过该对象调用isReachableViaWiFi函数，所以触发了苹果的异常case(千万不要在主线程中同步的通过hostname检测网络。如果设备不能访问dns server或网速很慢的情况下，同步调用SCNetworkReachabilityGetFlags可能会在解析域名时候阻塞长达30s)。我已经在stackoverflow上联系那小伙验证一下猜想了。等有结果了再分享给大家。</p>
 
 
 <p>附苹果Reachability Readme。
