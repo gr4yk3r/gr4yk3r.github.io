@@ -133,14 +133,14 @@
 <p>于是我开着挖掘机继续挖掘，挖到了苹果官网Reachability的Readme，挖着挖着挖到官方说明了，看下面原文描述：</p>
 
 
-<pre><code>    The Reachability sample demonstrates the asynchronous use of the SCNetworkReachability API. You can use the API synchronously, but do not issue a synchronous check by hostName on the main thread. If the device cannot reach a DNS server or is on a slow network, a synchronous call to the SCNetworkReachabilityGetFlags function can block for up to 30 seconds trying to resolve the hostName. If this happens on the main thread, the application watchdog will kill the application after 20 seconds of inactivity.
-</code></pre>
+<p>The Reachability sample demonstrates the asynchronous use of the SCNetworkReachability API. You can use the API synchronously, but do not issue a synchronous check by hostName on the main thread. If the device cannot reach a DNS server or is on a slow network, a synchronous call to the SCNetworkReachabilityGetFlags function can block for up to 30 seconds trying to resolve the hostName. If this happens on the main thread, the application watchdog will kill the application after 20 seconds of inactivity.</p>
+
 
 <p>上面blablabla一大段，说的什么意思呢？继续往下看翻译：</p>
 
 
-<pre><code>     这个Reachability例子展示了SCNetworkReachability API的异步使用方法，你可以同步的使用这些API（意思就是按apple那种异步使用方法，你在用时候就不用再做异步了，直接使用即可）,但是千万不要（do not而不是don't指特别强调）在主线程中同步的通过hostname检测网络。如果设备不能访问dns server或网速很慢的情况下，同步调用SCNetworkReachabilityGetFlags可能会在解析域名时候阻塞长达30s。如果发生在主线程，app就会在卡死20s后被watchdog杀死。
-</code></pre>
+<p>这个Reachability例子展示了SCNetworkReachability API的异步使用方法，你可以同步的使用这些API（意思就是按apple那种异步使用方法，你在用时候就不用再做异步了，直接使用即可）,但是千万不要（do not而不是don&#8217;t指特别强调）在主线程中同步的通过hostname检测网络。如果设备不能访问dns server或网速很慢的情况下，同步调用SCNetworkReachabilityGetFlags可能会在解析域名时候阻塞长达30s。如果发生在主线程，app就会在卡死20s后被watchdog杀死。</p>
+
 
 <p>仔细体会这段话，发现问题出现在网络不好情况下的域名解析过程中，所以这就完美解释了刚才第二个stackoverflow说的那种情况。之所以第一种用法会阻塞，就是因为在主线程同步的通过hostname检测网络状况，100%命中苹果的异常case。第二种用法没用域名检测，所以就没有问题！那么reachabilityForInternetConnection这种用法是怎么检测网络的呢，继续挖掘发现reachabilityForInternetConnection里构造了个sockaddr_in，初始化后直接通过reachabilityWithAddress构造的Reachability，因为sockaddr_in初始化没有对ip赋值，其实传给reachabilityWithAddress的ip是0.0.0.0，由于没有源码，具体怎么通过这个reachabilityForInternetConnection判断的网络状况还不太清楚，也不好妄加猜测，以免误导大家，不过按照苹果说法只要不在主线程中同步检测到某个域名的网络状况是不会卡死UI的。而且网上确实有按上述第二个stackoverflow提问中的第二种用法使用的（http://weimenglee.blogspot.jp/2013/08/ios-tip-detecting-network-connectivity.html），所以大家可放心使用。</p>
 
