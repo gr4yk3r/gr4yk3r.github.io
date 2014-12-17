@@ -4,7 +4,7 @@
   <title><![CDATA[gr4yk3r's Blog]]></title>
   <link href="http://gr4yk3r.github.io/atom.xml" rel="self"/>
   <link href="http://gr4yk3r.github.io/"/>
-  <updated>2014-11-27T16:55:10+08:00</updated>
+  <updated>2014-12-17T11:38:24+08:00</updated>
   <id>http://gr4yk3r.github.io/</id>
   <author>
     <name><![CDATA[gr4yk3r]]></name>
@@ -138,9 +138,10 @@ return NO;
 http://www.wooyun.org/
 </code></pre>
 
-<h3>ios安全相关介绍</h3>
+<h3>ios知识相关介绍</h3>
 
-<pre><code>http://security.ios-wiki.com/
+<pre><code>http://www.objc.io/
+http://security.ios-wiki.com/
 https://github.com/kennytm/iphone-private-frameworks
 https://github.com/nst/iOS-Runtime-Headers
 http://opensource.apple.com/source/objc4/objc4-493.11/runtime/
